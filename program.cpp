@@ -1,19 +1,51 @@
 #include <iostream>
 #include <ctime>
+#include <vector>
 
-// Dejar sólo una de las siguientes descomentadas, dependiendo de qué implementacion quiero usar.
-
-// Implementación usando sólo la directiva omp parallel.
-// #include "only-omp-parallel.h"
-// Implementación usando omp for sin usar reduction
-// #include "omp-for-without-reduction.h"
-// Implementación usando omp for y la clausula reduction.
+#include "calculator.h"
+#include "only-omp-parallel.h"
+#include "omp-for-without-reduction.h"
 #include "omp-for-reduction.h"
 
 using namespace std;
-int main()
+
+void informeUso(char* program){
+    cerr << "Programa para calcular una aproximacion del numero PI y obtener estadisticas de rendimiento" << endl
+    << endl
+    << "Uso: " << string(program) << " <implementacion> [steps]" << endl
+    << "    donde <implementacion> puede ser uno de los siguientes:" << endl
+    << "    parallel-only            Implementacion usando solo omp parallel" << endl
+    << "    without-reduction        Implementacion sin usar la clausula reduction" << endl
+    << "    for-reduction            Implementacion usando omp for reduction" << endl
+    << endl
+    << "    steps                    Cantidad de pasos que se haran para aproximar a PI, si no esta presente su valor sera de 100000" << endl;
+}
+
+int main(int arg_count, char** arg_vector)
 {
-    int pasos = 100000000;
+    if(arg_count == 1){
+        informeUso(arg_vector[0]);
+        return -1;
+    }
+    vector<string> args(arg_vector, arg_vector + arg_count);
+    calculator *c;
+    
+    if(args[1] == "parallel-only")
+        c = new OnlyParallel();
+    else if (args[1] == "without-reduction")
+        c = new WithoutReduction();
+    else if(args[1] == "for-reduction")
+        c = new ForReduction();
+    else{
+        informeUso(arg_vector[0]);
+        return -1;
+    }
+
+    int pasos = 100000;
+    if(args.size() > 2){
+        pasos = stoi(args[2]);
+    }
+
     int repeticiones = 10;
     long *tiempos = new long[repeticiones];
     clock_t inicio, fin;
@@ -22,10 +54,11 @@ int main()
     {
         inicio = clock();
         // El método calcularPI está implementado de manera diferente en cada uno de los archivos importados.
-        pi = calcularPI(pasos);
+        
+        pi = c->calcularPI(pasos);
         fin = clock();
         cout << "PI aproximado: " << pi
-             << " | Tiempo de cálculo: " << ((double)fin - (double)inicio) / (double)CLOCKS_PER_SEC << " segundos."
+             << " | Tiempo de calculo: " << ((double)fin - (double)inicio) / (double)CLOCKS_PER_SEC << " segundos."
              << endl << endl;
         tiempos[i] = fin - inicio;
     }
@@ -34,6 +67,6 @@ int main()
     {
         sum += (double)tiempos[i];
     }
-    cout << "Tiempo promedio de ejecución: " << (sum / (double)repeticiones) / (double)CLOCKS_PER_SEC << " segundos." << endl;
+    cout << "Tiempo promedio de ejecucion: " << (sum / (double)repeticiones) / (double)CLOCKS_PER_SEC << " segundos." << endl;
     return 0;
 }
