@@ -4,7 +4,9 @@
 // Dejar sólo una de las siguientes descomentadas, dependiendo de qué implementacion quiero usar.
 
 // Implementación usando sólo la directiva omp parallel.
-#include "only-omp-parallel.h"
+// #include "only-omp-parallel.h"
+// Implementación usando omp for sin usar reduction
+#include "omp-for-without-reduction.h"
 
 using namespace std;
 int main()
