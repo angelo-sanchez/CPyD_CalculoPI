@@ -6,7 +6,9 @@
 // Implementación usando sólo la directiva omp parallel.
 // #include "only-omp-parallel.h"
 // Implementación usando omp for sin usar reduction
-#include "omp-for-without-reduction.h"
+// #include "omp-for-without-reduction.h"
+// Implementación usando omp for y la clausula reduction.
+#include "omp-for-reduction.h"
 
 using namespace std;
 int main()
