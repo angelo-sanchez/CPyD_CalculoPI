@@ -9,8 +9,9 @@ double calcularPI(int pasos)
     for (int i = 0; i < pasos; i++)
     {
         double x = (i + 0.5) * step;
+        double y = 4.0 / (1.0 + x * x);
         #pragma omp critical
-        sum = sum + 4.0 / (1.0 + x * x);
+        sum = sum + y;
     }
     return step * sum;
 }
